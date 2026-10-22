@@ -3,198 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>下手ウマ・トークリサイタル</title>
+    <title>ぐにゃぐにゃ・ボイスシンセ</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: #f0f4f8;
-            color: #333;
+            background: #1a1a2e;
+            color: #e94560;
             text-align: center;
             margin: 0;
             padding: 20px;
         }
         .container {
-            max-width: 500px;
-            margin: 40px auto;
-            background: #fff;
+            max-width: 600px;
+            margin: 30px auto;
+            background: #16213e;
             padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
         }
         h1 {
-            font-size: 1.5rem;
-            color: #ff5722;
-            margin-bottom: 20px;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            color: #f0a500;
         }
-        textarea {
+        p {
+            color: #b2bec3;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+        /* ぐにゃぐにゃ操作エリア（タッチ・マウスパッド） */
+        #pad {
             width: 100%;
-            height: 100px;
-            padding: 12px;
-            font-size: 1rem;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            resize: vertical;
-            margin-bottom: 15px;
+            height: 220px;
+            background: #0f3460;
+            border: 3px dashed #e94560;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.1rem;
+            user-select: none;
+            touch-action: none;
         }
-        textarea:focus {
-            border-color: #ff5722;
-            outline: none;
+        #pad.active {
+            background: #e94560;
+            color: #1a1a2e;
+            border-style: solid;
         }
-        .controls {
+        /* 母音を切り替えるボタンたち */
+        .vowel-group {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
-            font-size: 0.9rem;
-            text-align: left;
         }
-        .controls label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .controls div {
+        .vowel-btn {
             flex: 1;
-            margin: 0 5px;
+            margin: 0 4px;
+            padding: 12px 0;
+            background: #0f3460;
+            color: #fff;
+            border: 2px solid #533483;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .vowel-btn.selected {
+            background: #f0a500;
+            color: #1a1a2e;
+            border-color: #f0a500;
+        }
+        .vowel-btn:hover {
+            opacity: 0.8;
+        }
+        .slider-box {
+            text-align: left;
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        .slider-box label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
         }
         input[type="range"] {
             width: 100%;
-        }
-        button {
-            background-color: #ff5722;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #e64a19;
-        }
-        button:active {
-            transform: scale(0.98);
-        }
-        .notice {
-            font-size: 0.8rem;
-            color: #777;
-            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>🎤 下手ウマ・トークリサイタル</h1>
-        <textarea id="textInput" placeholder="ここに喋らせたい言葉を入力してね（例：ちょうちょう、ちょうちょう、菜の葉にとまれ）">こんにちは、全音ブラボーの世界へようこそ！</textarea>
-        
-        <div class="controls">
-            <div>
-                <label for="wobbleRate">揺れ幅 (ビブラート): <span id="wobbleVal">5</span>Hz</label>
-                <input type="range" id="wobbleRate" min="0" max="15" value="5" step="0.5">
-            </div>
-            <div>
-                <label for="pitchSpeed">スピード: <span id="speedVal">1.0</span>x</label>
-                <input type="range" id="pitchSpeed" min="0.5" max="2.0" value="1.0" step="0.1">
-            </div>
+        <h1>🎤 ぐにゃぐにゃ・ボイスシンセ</h1>
+        <p>下の四角いエリアをマウスでグリグリ動かすと、声っぽい音がぐにゃぐにゃ鳴るよ！</p>
+
+        <!-- 母音選択 -->
+        <div class="vowel-group">
+            <button class="vowel-btn selected" data-vowel="A">あ</button>
+            <button class="vowel-btn" data-vowel="I">い</button>
+            <button class="vowel-btn" data-vowel="U">う</button>
+            <button class="vowel-btn" data-vowel="E">え</button>
+            <button class="vowel-btn" data-vowel="O">お</button>
         </div>
 
-        <button id="speakBtn">リサイタル開演！</button>
-        <div class="notice">※ブラウザの音声合成機能を使用しています。環境によっては声が出ない場合があります。</div>
+        <!-- 演奏パッド -->
+        <div id="pad">ここを押しながらマウスを動かす</div>
+
+        <!-- 揺れ（ビブラート）設定 -->
+        <div class="slider-box">
+            <label for="vibrato">ビブラート（揺れ幅）: <span id="vibVal">5</span>Hz</label>
+            <input type="range" id="vibrato" min="0" max="15" value="5" step="0.5">
+        </div>
     </div>
 
     <script>
-        const textInput = document.getElementById('textInput');
-        const speakBtn = document.getElementById('speakBtn');
-        const wobbleRateInput = document.getElementById('wobbleRate');
-        const speedVal = document.getElementById('speedVal');
-        const wobbleVal = document.getElementById('wobbleVal');
+        let audioCtx = null;
+        let osc = null;
+        let gainNode = null;
+        let filter1 = null;
+        let filter2 = null;
+        let lfo = null;
+        let lfoGain = null;
 
-        wobbleRateInput.addEventListener('input', (e) => {
-            wobbleVal.textContent = e.target.value;
+        const pad = document.getElementById('pad');
+        const vibSlider = document.getElementById('vibrato');
+        const vibVal = document.getElementById('vibVal');
+        const vowelBtns = document.querySelectorAll('.vowel-btn');
+
+        // 音声の母音ごとのフォルマント周波数設定（Hz）
+        // 人間の声は、基本波形に「特定の2つの周波数帯（F1, F2）」を強調すると「あいうえお」に聴こえる
+        const formants = {
+            'A': { f1: 800,  f2: 1200 },
+            'I': { f1: 300,  f2: 2300 },
+            'U': { f1: 350,  f2: 800  },
+            'E': { f1: 550,  f2: 1900 },
+            'O': { f1: 500,  f2: 900  }
+        };
+        let currentVowel = 'A';
+
+        vowelBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                vowelBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                currentVowel = btn.dataset.vowel;
+                updateFormants();
+            });
         });
 
-        document.getElementById('pitchSpeed').addEventListener('input', (e) => {
-            speedVal.textContent = e.target.value;
-        });
-
-        speakBtn.addEventListener('click', () => {
-            const text = textInput.value.trim();
-            if (!text) return;
-
-            if (!('speechSynthesis' in window)) {
-                alert('お使いのブラウザは音声合成に対応していません。');
-                return;
+        vibSlider.addEventListener('input', (e) => {
+            vibVal.textContent = e.target.value;
+            if (lfo) {
+                lfo.frequency.setTargetAtTime(parseFloat(e.target.value), audioCtx.currentTime, 0.05);
             }
-
-            // 既存の音声をストップ
-            window.speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = parseFloat(document.getElementById('pitchSpeed').value);
-            utterance.pitch = 1.2; // 少し高めのボイスベース
-
-            // 日本語の音声を探して設定
-            const voices = window.speechSynthesis.getVoices();
-            const jpVoice = voices.find(v => v.lang.includes('ja') || v.lang.includes('JA'));
-            if (jpVoice) {
-                utterance.voice = jpVoice;
-            }
-
-            // Web Audio API を使ったぐにゃぐにゃエフェクトの構築
-            // ※ブラウザの仕様上、SpeechSynthesisの生出力を直接Web AudioのNodeにルーティングするのは制限があるため、
-            //   ここでは音声合成に合わせて疑似的に「あの不穏なビブラート音やピッチの変化」を重ねるか、
-            //   あるいはWeb Audioのオシレーター（シンセ）でメロディっぽく鳴らすアプローチが安定します。
-            // 今回はシンプルに、リサイタルっぽさを出すために音声合成と同時にシンセ音を裏で鳴らす演出にしています！
-            
-            playRecitalBGM(text.length * 300); // 雰囲気用の演出
-
-            window.speechSynthesis.speak(utterance);
         });
 
-        // リサイタル感を出すための簡易シンセ・ビブラート演出
-        function playRecitalBGM(duration) {
-            try {
+        // サウンドの初期化と開始
+        function startSound(e) {
+            if (!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const ctx = new AudioContext();
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
 
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                const lfo = ctx.createOscillator();
-                const lfoGain = ctx.createGain();
+            if (osc) return; // すでに鳴ってたら何もしない
 
-                const wobble = parseFloat(wobbleRateInput.value);
+            pad.classList.add('active');
+            pad.textContent = "おー♪ ぐにゃぐにゃ中...";
 
-                // メインの音（ちょっと外れたレトロな矩形波やノコギリ波）
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(330, ctx.currentTime); // E4あたり
+            // メインの音（ノコギリ波：声らしい倍音を多く含む）
+            osc = audioCtx.createOscillator();
+            osc.type = 'sawtooth';
 
-                // ピッチを揺らすLFO（ビブラート）
-                lfo.type = 'sine';
-                lfo.frequency.setValueAtTime(wobble, ctx.currentTime);
-                lfoGain.gain.setValueAtTime(40, ctx.currentTime); // 揺れの幅
+            // ビブラート用LFO
+            lfo = audioCtx.createOscillator();
+            lfo.type = 'sine';
+            lfo.frequency.setValueAtTime(parseFloat(vibSlider.value), audioCtx.currentTime);
+            lfoGain = audioCtx.createGain();
+            lfoGain.gain.setValueAtTime(25, audioCtx.currentTime); // 揺れの深さ
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc.frequency);
 
-                lfo.connect(lfoGain);
-                lfoGain.connect(osc.frequency);
+            // フォルマントフィルター1（人間っぽい響きを作る）
+            filter1 = audioCtx.createBiquadFilter();
+            filter1.type = 'bandpass';
+            filter1.Q.value = 5.0;
 
-                // 音量調整
-                gain.gain.setValueAtTime(0.05, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (duration / 1000));
+            // フォルマントフィルター2
+            filter2 = audioCtx.createBiquadFilter();
+            filter2.type = 'bandpass';
+            filter2.Q.value = 5.0;
 
-                osc.connect(gain);
-                gain.connect(ctx.destination);
+            // 音量調節用ゲイン
+            gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.12, audioCtx.currentTime + 0.1); // プツッと音がしないようにフェードイン
 
-                lfo.start();
-                osc.start();
-                lfo.stop(ctx.currentTime + (duration / 1000));
-                osc.stop(ctx.currentTime + (duration / 1000));
-            } catch (e) {
-                console.log(e);
+            // 接続配線: osc -> 2つのフィルターを並列っぽく繋ぐ（簡易的に直列またはミックス）
+            osc.connect(filter1);
+            filter1.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            updateFormants();
+
+            osc.start();
+            lfo.start();
+
+            updatePosition(e);
+        }
+
+        // マウスの位置に合わせて音程やフィルターをグリグリ変える
+        function updatePosition(e) {
+            if (!osc) return;
+
+            const rect = pad.getBoundingClientRect();
+            // タッチ操作かマウス操作か
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            let x = (clientX - rect.left) / rect.width;
+            let y = (clientY - rect.top) / rect.height;
+
+            // 画面外にはみ出さないように制限
+            x = Math.max(0, Math.min(1, x));
+            y = Math.max(0, Math.min(1, y));
+
+            // 左右で音程を変える（低いド〜高い高い音まで、約150Hz〜800Hz）
+            const minFreq = 150;
+            const maxFreq = 750;
+            const freq = minFreq + (1 - y) * (maxFreq - minFreq); // 上に行くほど高く
+            osc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.05);
+
+            // 上下や横の動きでフィルターの効き（口の開き方っぽさ）を少し変化させる
+            const formant = formants[currentVowel];
+            const dynamicF1 = formant.f1 + (x - 0.5) * 300;
+            if (filter1) {
+                filter1.frequency.setTargetAtTime(dynamicF1, audioCtx.currentTime, 0.05);
             }
         }
+
+        function stopSound() {
+            if (!osc) return;
+            pad.classList.remove('active');
+            pad.textContent = "ここを押しながらマウスを動かう";
+
+            // フェードアウトさせてから停止
+            gainNode.gain.setValueAtTime(gainNode.gain.value, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+
+            setTimeout(() => {
+                if (osc) {
+                    osc.stop();
+                    lfo.stop();
+                    osc.disconnect();
+                    lfo.disconnect();
+                    osc = null;
+                    lfo = null;
+                }
+            }, 100);
+        }
+
+        function updateFormants() {
+            if (!filter1) return;
+            const formant = formants[currentVowel];
+            filter1.frequency.setValueAtTime(formant.f1, audioCtx.currentTime);
+        }
+
+        // イベント登録（マウス＆タッチ対応）
+        pad.addEventListener('mousedown', startSound);
+        window.addEventListener('mousemove', (e) => {
+            if (osc) updatePosition(e);
+        });
+        window.addEventListener('mouseup', stopSound);
+
+        pad.addEventListener('touchstart', (e) => { startSound(e); e.preventDefault(); });
+        window.addEventListener('touchmove', (e) => { if (osc) updatePosition(e); }, { passive: false });
+        window.addEventListener('touchend', stopSound);
     </script>
 </body>
 </html>
